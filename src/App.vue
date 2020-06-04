@@ -53,21 +53,85 @@
                 ></v-switch>
               </v-card-title>
               <v-card-text>
-                <v-row>
+                <v-row class="mx-1">
                   <v-spacer></v-spacer>
                   <v-select
                     v-model="warmTime"
                     :items="times"
                     hide-details
-                    prepend-icon="mdi-timer-outline"
                     single-line
-                  ></v-select>
+                    :disabled="!warmSwitch"
+                  >
+                    <template v-slot:prepend>
+                      <v-icon :class="{'primary--text':warmSwitch}">mdi-timer-outline</v-icon>
+                    </template>
+                  </v-select>
                 </v-row>
               </v-card-text>
             </v-card>
           </v-col>
 
-          
+          <v-col cols="12" v-for="(block, i) in blocks" :key="block.id">
+            <v-card>
+              <v-card-title>
+                #{{i+1}}
+                <v-spacer></v-spacer>
+                <v-btn 
+                  icon 
+                  color="error"
+                  @click="deleteBlock(block.id)">
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-text>
+                <v-row class="mx-1" align="end">
+                  <span class="headline">Jog</span>
+                  <v-spacer></v-spacer>
+                  <v-select
+                    v-model="block.jogTime"
+                    :items="times"
+                    hide-details
+                    single-line
+                  >
+                    <template v-slot:prepend>
+                      <v-icon color="primary">mdi-timer-outline</v-icon>
+                    </template>
+                  </v-select>
+                </v-row>
+                <v-row class="mx-1" align="end">
+                  <span class="headline">Walk</span>
+                  <v-spacer></v-spacer>
+                  <v-select
+                    v-model="block.walkTime"
+                    :items="times"
+                    hide-details
+                    single-line
+                  >
+                    <template v-slot:prepend>
+                      <v-icon color="primary">mdi-timer-outline</v-icon>
+                    </template>
+                  </v-select>
+                </v-row>
+                <v-row class="mx-1" align="end">
+                  <span class="headline">Repeat</span>
+                  <v-spacer></v-spacer>
+                  <v-select
+                    v-model="block.repeat"
+                    :items="repeatTimes"
+                    hide-details
+                    single-line
+                    class="mr-1"
+                  >
+                    <template v-slot:prepend>
+                      <v-icon :class="{'primary--text':coolSwitch}">mdi-repeat</v-icon>
+                    </template>
+                  </v-select>
+                  <span v-if="block.repeat === 1" class="title">time</span>
+                  <span v-else class="title">times</span>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-col>
 
           <v-col cols="12">
             <v-card>
@@ -81,32 +145,64 @@
                 ></v-switch>
               </v-card-title>
               <v-card-text>
-                <v-row>
+                <v-row class="mx-1">
                   <v-spacer></v-spacer>
                   <v-select
                     v-model="coolTime"
                     :items="times"
                     hide-details
-                    prepend-icon="mdi-timer-outline"
                     single-line
-                  ></v-select>
+                    :disabled="!coolSwitch"
+                  >
+                    <template v-slot:prepend>
+                      <v-icon :class="{'primary--text':coolSwitch}">mdi-timer-outline</v-icon>
+                    </template>
+                  </v-select>
                 </v-row>
               </v-card-text>
             </v-card>
           </v-col>
 
+
         </v-row>
+
+        <v-btn
+          fab
+          fixed
+          bottom
+          left
+          color="success"
+          @click="addBlock()"
+        >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+
+        <v-btn
+          fab
+          fixed
+          bottom
+          right
+          color="primary"
+          @click="go()"
+        >
+          <v-icon>mdi-run-fast</v-icon>
+        </v-btn>
+
       </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script>
+import {v4 as uuidv4} from 'uuid';
+
 export default {
   name: 'App',
 
   data: () => ({
     times: [],
+    blocks: [],
+    repeatTimes: [1,2,3,4,5,6,7,8,9,10],
 
     warmSwitch: false,
     warmTime: '5:00',
@@ -131,6 +227,26 @@ export default {
       let sec = s - (min * 60);
       sec = (sec < 10) ? `0${sec}` : sec;
       return `${min}:${sec}`;
+    },
+
+    addBlock() {
+      const block = {
+        id: uuidv4(),
+        jogTime: '1:00',
+        walkTime: '1:00',
+        repeat: 1,
+      }
+      this.blocks.push(block);
+    },
+
+    deleteBlock(id) {
+      this.blocks = this.blocks.filter(block => block.id !== id);
+    },
+
+    go() {
+      
+
+
     },
   }
 };
