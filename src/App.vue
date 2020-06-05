@@ -44,7 +44,7 @@
           <v-col cols="12">
             <v-card>
               <v-card-title>
-                Warmup
+                Warm Up
                 <v-spacer></v-spacer>
                 <v-switch
                   v-model="warmSwitch"
@@ -136,7 +136,7 @@
           <v-col cols="12">
             <v-card>
               <v-card-title>
-                Cooldown
+                Cool Down
                 <v-spacer></v-spacer>
                 <v-switch
                   v-model="coolSwitch"
@@ -188,6 +188,36 @@
           <v-icon>mdi-run-fast</v-icon>
         </v-btn>
 
+        <v-dialog
+          v-model="dialog"
+        >
+          <v-card>
+            <v-card-title
+              class="headline primary lighten-2"
+              primary-title
+            >
+              {{ dialogTitle }}
+            </v-card-title>
+
+            <v-card-text>
+              
+            </v-card-text>
+
+            <v-divider></v-divider>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="primary"
+                text
+                @click="dialog = false"
+              >
+                Done
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
       </v-container>
     </v-content>
   </v-app>
@@ -209,6 +239,11 @@ export default {
 
     coolSwitch: false,
     coolTime: '5:00',
+
+    program: [],
+
+    dialog: false,
+    dialogTitle: '',
   }),
 
   created() {
@@ -244,9 +279,46 @@ export default {
     },
 
     go() {
-      
+      this.program = [];
 
+      if (this.warmSwitch) {
+        const warmup = {
+          title: 'Warm Up',
+          time: this.warmTime
+        }
+        this.program.push(warmup);
+      }
 
+      if (this.blocks.length > 0) {
+        this.program.push(...this.blocks);
+      } else {
+        // alert user to enter at least one block
+        return;
+      }
+
+      if (this.coolSwitch) {
+        const cooldown = {
+          title: 'Cool Down',
+          time: this.coolTime
+        }
+        this.program.push(cooldown);
+      }
+
+      this.run();
+    },
+
+    run() {
+      this.dialog = true;
+
+      this.program.forEach((block, i) => {
+        if (block.name && block.name === 'Warm Up') {
+          this.dialogTitle = block.name;
+        } else if (block.name && block.name === ' Cool Down') {
+          this.dialogTitle = block.name;
+        } else {
+          this.dialogTitle = `Block ${i+1}/${this.program.length}`;
+        }
+      });
     },
   }
 };
